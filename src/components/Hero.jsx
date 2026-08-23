@@ -60,7 +60,6 @@ function AppChrome({ active, children }) {
 const SCANNED = [
   ['890123456001', '18:00:54', true],
   ['890123456002', '18:00:41', false],
-  ['890123456003', '18:00:22', false],
 ]
 
 function StationPreview() {
@@ -109,12 +108,12 @@ function StationPreview() {
             <div className="ps-list">
               <div className="ps-list-top">
                 <strong>Scanned products</strong>
-                <b>3</b>
+                <b>{SCANNED.length}</b>
               </div>
               <ul>
                 {SCANNED.map(([code, time, latest], i) => (
                   <li key={code} className={latest ? 'on' : ''}>
-                    <span className="ps-n">{3 - i}</span>
+                    <span className="ps-n">{SCANNED.length - i}</span>
                     <div>
                       <strong>{code}</strong>
                       <em>{time}{latest ? ' · Latest' : ''}</em>
@@ -472,8 +471,9 @@ export default function Hero() {
               Turn every order packed into <span className="pill-hl">proof</span>
             </h1>
             <p className="sub">
-              Packing video tied to the order number you already scan. Run it on your own
-              warehouse server, or in the cloud. Recover claims from the recording, not from CCTV.
+              Packing disputes drain time and trust. irisAI files video and scan proof under the
+              order number you already use, so claims are settled from the recording, not from a
+              CCTV hunt.
             </p>
             <div className="hero-cta">
               <a className="btn btn-primary" href="#cta">Book a demo</a>

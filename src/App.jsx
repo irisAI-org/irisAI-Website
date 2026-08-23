@@ -8,6 +8,7 @@ import Compare from './components/Compare.jsx'
 import Testimonials from './components/Testimonials.jsx'
 import Integrations from './components/Integrations.jsx'
 import Numbers from './components/Numbers.jsx'
+import FAQ from './components/FAQ.jsx'
 import CTA from './components/CTA.jsx'
 import Footer from './components/Footer.jsx'
 
@@ -49,6 +50,7 @@ export default function App() {
         <Testimonials />
         <Integrations />
         <Numbers />
+        <FAQ />
         <CTA />
       </main>
       <Footer />

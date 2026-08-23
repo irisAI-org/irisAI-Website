@@ -98,7 +98,7 @@ export default function Integrations() {
   const wire = Object.fromEntries(links.map((l) => [l.id, l.d]))
 
   // SVG text neither wraps nor shrinks, and Inter arrives from the network after
-  // first paint — so no width guessed at author time is ever right. Measure the
+  // first paint, so no width guessed at author time is ever right. Measure the
   // glyphs once the real font is in, then fit every box to what it actually got.
   useLayoutEffect(() => {
     const svg = svgRef.current
@@ -279,17 +279,17 @@ export default function Integrations() {
                 <circle className="intg-pulse two" cx={HUB.x} cy={HUB.y} r="66" />
               </g>
 
-              {/* 1 — the scan leaves the packer's hand */}
+              {/* 1: the scan leaves the packer's hand */}
               <circle className="intg-ripple" cx="280" cy="104" r="24" />
               <circle className="intg-pk pk-scan" cx="0" cy="0" r="3.6" style={{ offsetPath: `path("${wire.scan}")` }} />
 
-              {/* 2 — the cameras stream while the pack is open */}
+              {/* 2: the cameras stream while the pack is open */}
               <circle className="intg-pk pk-cam" cx="0" cy="0" r="3.2" style={{ offsetPath: `path("${wire.cam1}")` }} />
               <circle className="intg-pk pk-cam d2" cx="0" cy="0" r="3.2" style={{ offsetPath: `path("${wire.cam1}")` }} />
               <circle className="intg-pk pk-cam d1" cx="0" cy="0" r="3.2" style={{ offsetPath: `path("${wire.cam2}")` }} />
               <circle className="intg-pk pk-cam d3" cx="0" cy="0" r="3.2" style={{ offsetPath: `path("${wire.cam2}")` }} />
 
-              {/* 4 — the filed clip plays back out to the bench and handheld scanner */}
+              {/* 4: the filed clip plays back out to the bench and handheld scanner */}
               <circle className="intg-pk pk-out" cx="0" cy="0" r="3.6" style={{ offsetPath: `path("${wire.pc}")` }} />
               <circle className="intg-pk pk-out late" cx="0" cy="0" r="3.6" style={{ offsetPath: `path("${wire.hh}")` }} />
 
@@ -305,7 +305,7 @@ export default function Integrations() {
                   <text x="4" y="0">Recording</text>
                 </g>
 
-                {/* 3 — the clip lands under the order number */}
+                {/* 3: the clip lands under the order number */}
                 <g transform={`translate(${HUB.x + 46} ${HUB.y - 48})`}>
                   <g className="intg-filed">
                     <rect x="-27" y="-11" width="54" height="22" rx="11" />
