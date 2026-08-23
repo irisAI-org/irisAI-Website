@@ -4,11 +4,10 @@ import Hero from './components/Hero.jsx'
 import Features from './components/Features.jsx'
 import StatsBand from './components/StatsBand.jsx'
 import HowItWorks from './components/HowItWorks.jsx'
+import Compare from './components/Compare.jsx'
 import Testimonials from './components/Testimonials.jsx'
 import Integrations from './components/Integrations.jsx'
 import Numbers from './components/Numbers.jsx'
-import Credentials from './components/Credentials.jsx'
-import Resources from './components/Resources.jsx'
 import CTA from './components/CTA.jsx'
 import Footer from './components/Footer.jsx'
 
@@ -46,11 +45,10 @@ export default function App() {
         <Features />
         <StatsBand />
         <HowItWorks />
+        <Compare />
         <Testimonials />
         <Integrations />
         <Numbers />
-        <Credentials />
-        <Resources />
         <CTA />
       </main>
       <Footer />

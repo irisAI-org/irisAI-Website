@@ -5,10 +5,10 @@ const HUB = { x: 280, y: 292 }
 
 const POINTS = [
   { id: 'scan', x: 280, y: 104, label: 'Barcode scanner', sub: 'Plugs in like a keyboard', glyph: 'scanner' },
-  { id: 'cam1', x: 124, y: 198, label: 'Bench camera', sub: 'Packing station 01', glyph: 'dome' },
-  { id: 'cam2', x: 436, y: 198, label: 'Bench camera', sub: 'Packing station 02', glyph: 'bullet' },
+  { id: 'cam1', x: 124, y: 198, label: 'Bench camera', sub: 'Packing station 01', glyph: 'camera' },
+  { id: 'cam2', x: 436, y: 198, label: 'Bench camera', sub: 'Packing station 02', glyph: 'camera' },
   { id: 'pc', x: 138, y: 412, label: 'Bench computer', sub: 'Desktop app or browser', glyph: 'desktop' },
-  { id: 'droid', x: 422, y: 412, label: 'Packer phone', sub: 'Android app', glyph: 'phone' },
+  { id: 'hh', x: 422, y: 412, label: 'Handheld scanner', sub: 'Warehouse floor scan', glyph: 'handheld' },
 ]
 
 const CAPTIONS = [
@@ -19,7 +19,7 @@ const CAPTIONS = [
 ]
 
 // Node box: [pad][icon][gap][text][pad], three lines of type
-const NODE = { padL: 11, ico: 35, gap: 11, padR: 15, h: 58 }
+const NODE = { padL: 10, ico: 42, gap: 10, padR: 14, h: 62 }
 // Status pill: [pad][dot][gap][text][pad]
 const PILL = { padL: 20, dot: 7, gap: 11, padR: 20, y: 458, h: 34 }
 
@@ -27,111 +27,69 @@ function linkPath(x, y) {
   return `M ${x} ${y} L ${HUB.x} ${HUB.y}`
 }
 
-/* Device icons drawn as real objects on a 32 grid: white camera housings, a
-   dark rack with lit bays, glowing screens. Full colour rather than a tinted
-   monochrome outline, so each one reads as the thing it is at 40px. */
+const DEVICE_PNG = {
+  camera: '/product/bench-camera-bullet.png',
+  handheld: '/product/bench-handheld-scanner.png',
+  desktop: '/product/bench-desktop-monitor.png',
+  rack: '/product/bench-server-rack.png',
+}
+
+function PngGlyph({ src }) {
+  return (
+    <image
+      href={src}
+      x="0"
+      y="0"
+      width="32"
+      height="32"
+      preserveAspectRatio="xMidYMid meet"
+    />
+  )
+}
+
+/* Scanner stays a vector glyph so it reads as “wedge / keyboard” vs the handheld gun PNG. */
 function Glyph({ kind }) {
-  if (kind === 'dome') {
-    return (
-      <g>
-        <rect x="14.9" y="8.8" width="2.2" height="3.2" rx="0.6" fill="#78859c" />
-        <ellipse cx="16" cy="15.1" rx="11.6" ry="2.5" fill="#a3afc2" />
-        <ellipse cx="16" cy="14.3" rx="11.6" ry="2.5" fill="url(#icPlate)" />
-        <path d="M4.4 15.1h23.2a11.6 8.2 0 0 1-23.2 0z" fill="url(#icBody)" />
-        <path d="M4.4 15.1h23.2a11.6 8.2 0 0 1-23.2 0z" fill="none" stroke="#93a1b6" strokeWidth="0.55" />
-        <path d="M6.4 15.1h19.2a9.6 6.6 0 0 1-4.6 5.5 9.6 6.6 0 0 0-10 0 9.6 6.6 0 0 1-4.6-5.5z" fill="#ffffff" opacity="0.42" />
-        <circle cx="16" cy="18.6" r="2.9" fill="#28324a" />
-        <circle cx="16" cy="18.6" r="1.95" fill="#0a101c" />
-        <circle cx="16" cy="18.6" r="0.95" fill="#161f33" />
-        <circle cx="15.1" cy="17.7" r="0.6" fill="#ffffff" opacity="0.55" />
-        <circle cx="23.6" cy="17" r="0.7" fill="#4ade80" />
-      </g>
-    )
-  }
-  if (kind === 'bullet') {
-    return (
-      <g>
-        <path d="M19.6 20.6v3" stroke="#78859c" strokeWidth="2.1" strokeLinecap="round" />
-        <rect x="14.8" y="23" width="9.6" height="2.5" rx="1.25" fill="url(#icPlate)" />
-        <rect x="4.6" y="12.9" width="4.6" height="6.2" rx="2.3" fill="#cdd7e6" />
-        <rect x="8" y="11.4" width="16.6" height="9.2" rx="4.6" fill="url(#icBody)" />
-        <path d="M7.4 11.1h12.4a4.4 4.4 0 0 1 4.4 4.4v0.2H7.4a0.7 0.7 0 0 1 0-2.6z" fill="#f4f7fc" />
-        <path d="M7.4 11.1h12.4a4.4 4.4 0 0 1 4.4 4.4v0.2H7.4a0.7 0.7 0 0 1 0-2.6z" fill="none" stroke="#aab6ca" strokeWidth="0.5" />
-        <ellipse cx="5.4" cy="16" rx="1.6" ry="3.1" fill="#28324a" />
-        <ellipse cx="5.4" cy="16" rx="1" ry="2.1" fill="#080e18" />
-        <ellipse cx="5.1" cy="15.1" rx="0.35" ry="0.6" fill="#ffffff" opacity="0.6" />
-        <path d="M12.4 20.6v-9.2" stroke="#b8c3d5" strokeWidth="0.5" />
-        <circle cx="21.2" cy="16.6" r="0.75" fill="#4ade80" />
-      </g>
-    )
-  }
   if (kind === 'scanner') {
     return (
       <g>
-        <rect x="4.4" y="6.6" width="23.2" height="18.8" rx="3.4" fill="url(#icPlate)" />
-        <rect x="4.4" y="6.6" width="23.2" height="18.8" rx="3.4" fill="none" stroke="#9aa8bf" strokeWidth="0.9" />
-        <g fill="#131a28">
-          <rect x="7.8" y="10.2" width="1.9" height="11.6" rx="0.5" />
-          <rect x="11" y="10.2" width="1" height="11.6" rx="0.4" />
-          <rect x="13.4" y="10.2" width="2.2" height="11.6" rx="0.5" />
-          <rect x="17" y="10.2" width="1" height="11.6" rx="0.4" />
-          <rect x="19.4" y="10.2" width="1.9" height="11.6" rx="0.5" />
-          <rect x="22.7" y="10.2" width="1.3" height="11.6" rx="0.4" />
+        {/* Compact wedge body */}
+        <path
+          d="M6.2 11.2h19.6c1.1 0 1.9.9 1.7 1.9l-1.6 9.2c-.2 1-.9 1.7-1.9 1.7H8c-1 0-1.7-.7-1.9-1.7l-1.6-9.2c-.2-1 .6-1.9 1.7-1.9z"
+          fill="url(#icWedge)"
+        />
+        <path
+          d="M6.2 11.2h19.6c1.1 0 1.9.9 1.7 1.9l-1.6 9.2c-.2 1-.9 1.7-1.9 1.7H8c-1 0-1.7-.7-1.9-1.7l-1.6-9.2c-.2-1 .6-1.9 1.7-1.9z"
+          fill="none"
+          stroke="#9eb0cc"
+          strokeWidth="0.85"
+        />
+        {/* Glass window */}
+        <rect x="8.2" y="13.4" width="15.6" height="6.4" rx="1.2" fill="#0c1424" />
+        <rect x="8.2" y="13.4" width="15.6" height="6.4" rx="1.2" fill="none" stroke="rgba(150,190,255,0.35)" strokeWidth="0.7" />
+        {/* Barcode marks under the glass */}
+        <g fill="#d7e4ff" opacity="0.72">
+          <rect x="9.4" y="14.6" width="1.1" height="4" rx="0.35" />
+          <rect x="11.2" y="14.6" width="0.55" height="4" rx="0.25" />
+          <rect x="12.5" y="14.6" width="1.4" height="4" rx="0.35" />
+          <rect x="14.6" y="14.6" width="0.55" height="4" rx="0.25" />
+          <rect x="15.9" y="14.6" width="1.1" height="4" rx="0.35" />
+          <rect x="17.7" y="14.6" width="0.7" height="4" rx="0.25" />
+          <rect x="19.2" y="14.6" width="1.3" height="4" rx="0.35" />
+          <rect x="21.2" y="14.6" width="0.55" height="4" rx="0.25" />
         </g>
+        {/* Red scan beam */}
+        <path d="M16 8.2v5.2" stroke="#ff5a6a" strokeWidth="1.35" strokeLinecap="round" opacity="0.9" />
+        <path d="M16 8.2v5.2" stroke="#ff8a96" strokeWidth="0.55" strokeLinecap="round" opacity="0.95" />
+        <circle cx="16" cy="7.4" r="1.35" fill="#ff5a6a" opacity="0.85" />
+        <circle cx="16" cy="7.4" r="2.4" fill="none" stroke="#ff5a6a" strokeWidth="0.7" opacity="0.35" />
+        {/* Status LED */}
+        <circle cx="24.2" cy="21.6" r="1.15" fill="#4ade80" />
+        <circle cx="24.2" cy="21.6" r="1.15" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="0.4" />
       </g>
     )
   }
-  if (kind === 'desktop') {
-    return (
-      <g>
-        <rect x="3.2" y="4.6" width="25.6" height="17" rx="2" fill="url(#icPlate)" />
-        <rect x="4.8" y="6.1" width="22.4" height="14" rx="1.1" fill="url(#icScreen)" />
-        <path d="M4.8 6.1h22.4v5.6l-22.4 8.4z" fill="#ffffff" opacity="0.13" />
-        <path d="M13.3 21.6h5.4l1.3 4.3h-8z" fill="#b4c0d4" />
-        <rect x="10.2" y="25.5" width="11.6" height="2.3" rx="1.15" fill="url(#icPlate)" />
-      </g>
-    )
-  }
-  if (kind === 'phone') {
-    return (
-      <g>
-        <rect x="10.1" y="2.6" width="11.8" height="26.8" rx="3.4" fill="#20293a" />
-        <rect x="10.1" y="2.6" width="11.8" height="26.8" rx="3.4" fill="none" stroke="#55637f" strokeWidth="0.85" />
-        <rect x="11.4" y="5.2" width="9.2" height="21.6" rx="1.7" fill="url(#icPhone)" />
-        <rect x="12.5" y="6.4" width="2.6" height="0.75" rx="0.37" fill="#ffffff" opacity="0.4" />
-        <rect x="17.6" y="6.4" width="1.9" height="0.75" rx="0.37" fill="#ffffff" opacity="0.32" />
-        <rect x="12.5" y="9" width="7" height="4.4" rx="1" fill="#ffffff" opacity="0.2" />
-        <rect x="12.5" y="14.8" width="5.2" height="1.1" rx="0.55" fill="#ffffff" opacity="0.24" />
-        <rect x="12.5" y="17.2" width="6.4" height="1.1" rx="0.55" fill="#ffffff" opacity="0.17" />
-        <rect x="12.5" y="19.6" width="4.4" height="1.1" rx="0.55" fill="#ffffff" opacity="0.13" />
-        <path d="M11.4 5.2h9.2v7.2l-9.2 6z" fill="#ffffff" opacity="0.07" />
-        <rect x="14.3" y="3.5" width="3.4" height="0.8" rx="0.4" fill="#4c5a75" />
-        <rect x="22.1" y="10.4" width="0.8" height="3.6" rx="0.4" fill="#4c5a75" />
-      </g>
-    )
-  }
-  // the rack at the centre of the board
-  return (
-    <g>
-      <rect x="6.4" y="3.4" width="19.2" height="25.2" rx="2.6" fill="url(#icRack)" />
-      <rect x="6.4" y="3.4" width="19.2" height="25.2" rx="2.6" fill="none" stroke="rgba(158,196,255,0.42)" strokeWidth="0.9" />
-      <g>
-        <rect x="8.8" y="6" width="14.4" height="5.6" rx="1.1" fill="rgba(255,255,255,0.07)" stroke="rgba(160,200,255,0.28)" strokeWidth="0.7" />
-        <circle cx="11.2" cy="8.8" r="1" fill="#4ade80" />
-        <path d="M13.8 8.8h7.2" stroke="rgba(170,205,255,0.55)" strokeWidth="1.2" strokeLinecap="round" />
-      </g>
-      <g>
-        <rect x="8.8" y="13.2" width="14.4" height="5.6" rx="1.1" fill="rgba(255,255,255,0.07)" stroke="rgba(160,200,255,0.28)" strokeWidth="0.7" />
-        <circle cx="11.2" cy="16" r="1" fill="#4ade80" />
-        <path d="M13.8 16h7.2" stroke="rgba(170,205,255,0.55)" strokeWidth="1.2" strokeLinecap="round" />
-      </g>
-      <g>
-        <rect x="8.8" y="20.4" width="14.4" height="5.6" rx="1.1" fill="rgba(255,255,255,0.07)" stroke="rgba(160,200,255,0.28)" strokeWidth="0.7" />
-        <circle cx="11.2" cy="23.2" r="1" fill="#7eb8ff" />
-        <path d="M13.8 23.2h7.2" stroke="rgba(170,205,255,0.55)" strokeWidth="1.2" strokeLinecap="round" />
-      </g>
-    </g>
-  )
+  const src = DEVICE_PNG[kind]
+  return src ? <PngGlyph src={src} /> : null
 }
 
 export default function Integrations() {
@@ -255,8 +213,8 @@ export default function Integrations() {
               <div className="int-item">
                 <span className="int-item-ico"><IconDevices /></span>
                 <div>
-                  <h4>Bench computer or phone</h4>
-                  <p>Pack from the desktop app or a browser at the bench, or from the Android app anywhere on warehouse Wi‑Fi.</p>
+                  <h4>Bench computer or handheld scanner</h4>
+                  <p>Pack from the desktop app or a browser at the bench, or scan orders with a handheld scanner anywhere on the warehouse network.</p>
                 </div>
               </div>
             </div>
@@ -269,7 +227,7 @@ export default function Integrations() {
               className="intg-map"
               viewBox="0 0 560 540"
               role="img"
-              aria-label="A pack in progress: the packer scans an order, the bench cameras record to the irisAI server, the video is filed under that order, and it plays back on the bench computer and the packer's phone. Devices stay on your warehouse network; the server runs on-prem or in your cloud."
+              aria-label="A pack in progress: the packer scans an order, the bench cameras record to the irisAI server, the video is filed under that order, and it plays back on the bench computer and handheld scanner. Devices stay on your warehouse network; the server runs on-prem or in your cloud."
             >
               <defs>
                 <radialGradient id="intgHubHalo" cx="50%" cy="50%" r="50%">
@@ -285,28 +243,10 @@ export default function Integrations() {
                   <stop offset="0%" stopColor="#ffffff" stopOpacity="0.26" />
                   <stop offset="100%" stopColor="#5b9dff" stopOpacity="0.12" />
                 </linearGradient>
-                <linearGradient id="icBody" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ffffff" />
-                  <stop offset="52%" stopColor="#e4ebf6" />
-                  <stop offset="100%" stopColor="#b3c0d5" />
-                </linearGradient>
-                <linearGradient id="icPlate" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#f5f8fc" />
-                  <stop offset="100%" stopColor="#c4cfe0" />
-                </linearGradient>
-                <linearGradient id="icScreen" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#74bcff" />
-                  <stop offset="52%" stopColor="#2f86e8" />
-                  <stop offset="100%" stopColor="#1552ac" />
-                </linearGradient>
-                <linearGradient id="icPhone" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#4e9ae4" />
-                  <stop offset="52%" stopColor="#2568b8" />
-                  <stop offset="100%" stopColor="#123f7f" />
-                </linearGradient>
-                <linearGradient id="icRack" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#3b4664" />
-                  <stop offset="100%" stopColor="#141a29" />
+                <linearGradient id="icWedge" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#eef3fb" />
+                  <stop offset="55%" stopColor="#c5d0e4" />
+                  <stop offset="100%" stopColor="#9aabc6" />
                 </linearGradient>
               </defs>
 
@@ -349,9 +289,9 @@ export default function Integrations() {
               <circle className="intg-pk pk-cam d1" cx="0" cy="0" r="3.2" style={{ offsetPath: `path("${wire.cam2}")` }} />
               <circle className="intg-pk pk-cam d3" cx="0" cy="0" r="3.2" style={{ offsetPath: `path("${wire.cam2}")` }} />
 
-              {/* 4 — the filed clip plays back out to the bench and the phone */}
+              {/* 4 — the filed clip plays back out to the bench and handheld scanner */}
               <circle className="intg-pk pk-out" cx="0" cy="0" r="3.6" style={{ offsetPath: `path("${wire.pc}")` }} />
-              <circle className="intg-pk pk-out late" cx="0" cy="0" r="3.6" style={{ offsetPath: `path("${wire.droid}")` }} />
+              <circle className="intg-pk pk-out late" cx="0" cy="0" r="3.6" style={{ offsetPath: `path("${wire.hh}")` }} />
 
               <g className="intg-hub">
                 <rect className="intg-hub-box" x={HUB.x - 58} y={HUB.y - 54} width="116" height="108" rx="20" />

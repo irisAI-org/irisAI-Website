@@ -6,8 +6,8 @@ export default function Logo({ href = '#top' }) {
         className="mark-img"
         src="/brand/iris_Logo.png"
         alt=""
-        width={45}
-        height={36}
+        width={54}
+        height={48}
       />
       <span className="lockup">
         <span className="wordmark">

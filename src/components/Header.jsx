@@ -6,7 +6,6 @@ const LINKS = [
   ['#how', 'How it works'],
   ['#why', 'Why irisAI'],
   ['#setup', 'Setup'],
-  ['#resources', 'How teams use it'],
 ]
 
 export default function Header() {
