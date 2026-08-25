@@ -7,6 +7,7 @@ const COLS = [
     [
       ['Packing recording', '#features'],
       ['How it works', '#how'],
+      ['For managers', '#insights'],
       ['What changes', '#compare'],
       ['Why irisAI', '#why'],
       ['FAQs', '#faq'],

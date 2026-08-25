@@ -4,6 +4,7 @@ import Hero from './components/Hero.jsx'
 import Features from './components/Features.jsx'
 import StatsBand from './components/StatsBand.jsx'
 import HowItWorks from './components/HowItWorks.jsx'
+import Insights from './components/Insights.jsx'
 import Compare from './components/Compare.jsx'
 import Testimonials from './components/Testimonials.jsx'
 import Integrations from './components/Integrations.jsx'
@@ -46,6 +47,7 @@ export default function App() {
         <Features />
         <StatsBand />
         <HowItWorks />
+        <Insights />
         <Compare />
         <Testimonials />
         <Integrations />

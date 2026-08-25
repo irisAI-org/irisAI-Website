@@ -4380,6 +4380,159 @@ nav.main a:hover {
   }
 }
 
+/* ============================================================
+   Insights — the admin / manager view (floor KPIs + per-packer)
+   ============================================================ */
+.insights { position: relative; }
+
+.ins {
+  display: grid;
+  grid-template-columns: 0.78fr 1.22fr;
+  gap: 56px;
+  align-items: center;
+}
+@media (max-width: 1080px) {
+  .ins { grid-template-columns: 1fr; gap: 44px; }
+}
+
+.ins-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+.ins-eyebrow::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--orange);
+  box-shadow: 0 0 12px rgba(255, 107, 26, 0.55);
+}
+.ins-copy h2 {
+  font-family: 'Inter Tight', Inter, system-ui, sans-serif;
+  font-size: clamp(1.55rem, 2.9vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+.ins-lede {
+  color: var(--muted);
+  font-size: 0.98rem;
+  margin-top: 12px;
+  max-width: 46ch;
+}
+
+.ins-points { margin-top: 24px; display: grid; gap: 10px; }
+.ins-point {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 18px;
+  overflow: hidden;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+.ins-point::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--pt, var(--blue));
+  opacity: 0.85;
+}
+.ins-point.tone-blue { --pt: var(--blue); --pt-soft: rgba(91, 141, 239, 0.16); }
+.ins-point.tone-green { --pt: #34d68a; --pt-soft: rgba(52, 214, 138, 0.14); }
+.ins-point.tone-orange { --pt: var(--orange); --pt-soft: rgba(255, 107, 26, 0.14); }
+.ins-point:hover {
+  border-color: var(--line2);
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateX(3px);
+}
+.ins-point-ico {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pt, var(--blue));
+  background: var(--pt-soft, rgba(91, 141, 239, 0.16));
+  border: 1px solid color-mix(in srgb, var(--pt, var(--blue)) 35%, transparent);
+}
+.ins-point-ico svg { width: 20px; height: 20px; }
+.ins-point h4 { font-size: 0.98rem; font-weight: 600; letter-spacing: -0.015em; }
+.ins-point p { color: var(--faint); font-size: 0.88rem; margin-top: 4px; line-height: 1.5; }
+
+.ins-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--orange);
+}
+.ins-cta span { transition: transform 0.2s; }
+.ins-cta:hover span { transform: translateX(4px); }
+
+/* --- the admin dashboard mock (same white app language as the hero) --- */
+.ins-shot { position: relative; }
+.ins-shot-glow {
+  position: absolute;
+  inset: -8% -6%;
+  background: radial-gradient(55% 55% at 55% 45%, rgba(91, 141, 239, 0.22), transparent 70%);
+  pointer-events: none;
+}
+/* browser-style frame around the real dashboard capture */
+.ins-frame {
+  position: relative;
+  margin: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: #0d1846;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 30px 90px rgba(3, 8, 30, 0.65);
+}
+.ins-frame-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.ins-frame-dots { display: flex; gap: 6px; }
+.ins-frame-dots i {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+}
+.ins-frame-dots i:nth-child(1) { background: #ff5f57; }
+.ins-frame-dots i:nth-child(2) { background: #febc2e; }
+.ins-frame-dots i:nth-child(3) { background: #28c840; }
+.ins-frame-bar em {
+  font-style: normal;
+  font-size: 0.7rem;
+  color: var(--faint);
+  margin: 0 auto;
+  padding: 3px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.ins-frame img { display: block; width: 100%; }
+
 /* ---------- reveal ---------- */
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s ease; }
 .reveal.in { opacity: 1; transform: none; }

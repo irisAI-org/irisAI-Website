@@ -4,6 +4,7 @@ import Logo from './Logo.jsx'
 const LINKS = [
   ['#features', 'Product'],
   ['#how', 'How it works'],
+  ['#insights', 'For managers'],
   ['#why', 'Why irisAI'],
   ['#setup', 'Setup'],
 ]
