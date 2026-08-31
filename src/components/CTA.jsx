@@ -1,5 +1,15 @@
 import { useState } from 'react'
 
+// Where demo requests land. FormSubmit relays the post to this inbox, so there
+// is no server to run and no API key in the bundle.
+//
+// ACTIVATION IS PER (inbox, site URL). FormSubmit mails an "Activate Form" link
+// the first time a given domain posts here, and drops everything until it is
+// clicked. A localhost activation does NOT carry over to production -- submit
+// once from the live domain and activate from that mail. Changing this address
+// starts the same dance again.
+const INBOX = 'sales@irisai.co.in'
+
 const POINTS = [
   '20-minute live walkthrough',
   'Scan, pack, and pull the clip in Reports',
@@ -7,11 +17,29 @@ const POINTS = [
 ]
 
 export default function CTA() {
-  const [sent, setSent] = useState(false)
+  const [status, setStatus] = useState('idle')
+  const sent = status === 'sent'
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
-    setSent(true)
+    const form = e.currentTarget
+    setStatus('sending')
+    try {
+      const res = await fetch(`https://formsubmit.co/ajax/${INBOX}`, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: new FormData(form),
+      })
+      // FormSubmit answers 200 even when it drops the message (an inactivated
+      // inbox, for one), so the body is what decides -- never res.ok alone.
+      const data = await res.json().catch(() => null)
+      const delivered = res.ok && data && String(data.success) === 'true'
+      if (!delivered) throw new Error(data?.message || 'Submit failed')
+      form.reset()
+      setStatus('sent')
+    } catch {
+      setStatus('error')
+    }
   }
 
   return (
@@ -53,6 +81,9 @@ export default function CTA() {
               </div>
             ) : (
               <form className="cta-form" onSubmit={onSubmit}>
+                <input type="hidden" name="_subject" value="irisAI demo request" />
+                <input type="hidden" name="_template" value="table" />
+                <input type="hidden" name="_captcha" value="false" />
                 <p className="cta-form-kicker">Request a demo</p>
                 <label className="cta-field">
                   <span>Full name</span>
@@ -74,11 +105,17 @@ export default function CTA() {
                     placeholder="Warehouse size, packing stations, or anything we should know"
                   />
                 </label>
-                <button className="btn btn-primary cta-submit" type="submit">
-                  Book a demo
+                <button className="btn btn-primary cta-submit" type="submit" disabled={status === 'sending'}>
+                  {status === 'sending' ? 'Sending...' : 'Book a demo'}
                   <span aria-hidden="true">→</span>
                 </button>
-                <p className="cta-form-note">No spam. We only use this to schedule your walkthrough.</p>
+                {status === 'error' ? (
+                  <p className="cta-form-error" role="alert">
+                    Could not send just now. Please email <a href={`mailto:${INBOX}`}>{INBOX}</a> directly.
+                  </p>
+                ) : (
+                  <p className="cta-form-note">No spam. We only use this to schedule your walkthrough.</p>
+                )}
               </form>
             )}
           </div>

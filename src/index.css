@@ -4007,6 +4007,14 @@ nav.main a:hover {
   color: var(--faint);
   line-height: 1.4;
 }
+.cta-form-error {
+  margin-top: 12px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #ffb4a8;
+}
+.cta-form-error a { color: #fff; text-decoration: underline; }
+.cta-submit:disabled { opacity: 0.65; cursor: default; }
 
 .cta-thanks {
   display: flex;
@@ -4109,9 +4117,11 @@ nav.main a:hover {
 
 .foot-cols {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px 24px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px 22px;
 }
+/* email addresses are long and must never be clipped */
+.foot-col a { overflow-wrap: anywhere; }
 .foot-col h3 {
   margin: 0 0 16px;
   font-size: 0.7rem;

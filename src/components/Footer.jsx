@@ -22,13 +22,21 @@ const COLS = [
       ['Android packer', '#setup'],
     ],
   ],
+  [
+    'Contact',
+    [
+      ['sales@irisai.co.in', 'mailto:sales@irisai.co.in'],
+      ['support@irisai.co.in', 'mailto:support@irisai.co.in'],
+      ['admin@irisai.co.in', 'mailto:admin@irisai.co.in'],
+    ],
+  ],
 ]
 
 const CARDS = [
   {
     title: 'Contact sales',
-    href: '#cta',
-    hint: 'Book a demo',
+    href: 'mailto:sales@irisai.co.in',
+    hint: 'sales@irisai.co.in',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path
@@ -44,9 +52,9 @@ const CARDS = [
     ),
   },
   {
-    title: 'Help center',
-    href: '#faq',
-    hint: 'Setup & support',
+    title: 'Support',
+    href: 'mailto:support@irisai.co.in',
+    hint: 'support@irisai.co.in',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path
