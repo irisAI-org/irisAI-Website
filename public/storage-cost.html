@@ -226,17 +226,17 @@
 
     <div class="reco">
       <span class="eyebrow">Our recommendation</span>
-      <p>For one warehouse, a mirrored local drive pays for itself within the first year and then costs almost nothing. Choose cloud if your team must review videos from several locations every day, or there is nobody on site to look after hardware. Many customers do both: everything saved locally, and only disputed videos sent to the cloud when needed.</p>
+      <p>At a few hundred videos a day on an archive plan, cloud is the cheaper and simpler start, and there is nothing to look after on site. A local drive wins once you keep videos longer, add cameras, or pass roughly a terabyte in storage, because it is paid for once. irisAI works with either, and many customers do both: everything saved locally, with only disputed videos sent to the cloud.</p>
     </div>
 
     <div class="assume">
       <b>How the numbers are worked out</b>
       <ul>
         <li>Video size: measured from real irisAI recordings. Full HD averages 15 MB per minute (range 6 to 26 depending on movement and the camera's bitrate setting); 4K about 60 MB per minute; 720p estimated at 8 MB per minute. Videos are stored as the camera sends them, with no re-encoding.</li>
-        <li>Cloud: storage price per GB per month as selected (AWS Glacier Instant Retrieval ₹0.42, Wasabi or Backblaze B2 about ₹0.60, AWS S3 Infrequent Access ₹1.15, AWS S3 Standard ₹2.10, all Mumbai region list prices). An internet line at ₹1,000 a month is added only if selected. Per-video playback fees on the AWS Archive and Infrequent Access plans are small at these volumes and not included.</li>
-        <li>Local NAS: Synology DS224+ 2-bay unit about ₹34,000, plus two drives sized to your keep period (4 TB ₹10,000, 8 TB ₹18,000, 12 TB ₹27,000, 16 TB ₹36,000 each), mirrored so every video is kept twice. Electricity about ₹1,000 a year.</li>
+        <li>Cloud: storage price per GB per month as selected (AWS Glacier Instant Retrieval ₹0.42, Wasabi or Backblaze B2 about ₹0.60, AWS S3 Infrequent Access ₹1.15, AWS S3 Standard ₹2.10, all Mumbai region list prices). An internet line at ₹1,000 a month is added only if selected. On top of storage, a 30% cushion covers upload and playback fees, 18% GST and rupee-dollar movement, so the real bill should land under this page rather than over it. Archive plans charge every video for at least 90 days, which the calculator applies.</li>
+        <li>Local NAS: Synology DS224+ 2-bay unit about ₹34,000, plus two drives sized to your keep period (4 TB ₹10,000, 8 TB ₹18,000, 12 TB ₹27,000, 16 TB ₹36,000 each), mirrored so every video is kept twice, plus 18% GST. Electricity about ₹1,000 a year.</li>
         <li>Local single drive: one drive of the same size fitted in the irisAI station PC. No second copy.</li>
-        <li>Indicative Indian retail and provider list prices, October 2026, rounded, excluding GST. Your exact bill will differ; the comparison will not.</li>
+        <li>Indicative Indian retail and provider list prices, October 2026, rounded. Your exact bill will differ; the comparison will not.</li>
       </ul>
     </div>
   </div>
@@ -266,14 +266,19 @@
     $("print-inputs").textContent = `Calculated for ${perDay} videos a day, ${mins} minutes each, ${txt("quality")}, kept for ${txt("keep")}, cloud plan: ${txt("tier")}. ${txt("net")}.`;
     $("d-month").textContent = gb(gbMonth); $("d-stored").textContent = gb(stored);
 
+    // Archive plans bill every video for at least 90 days, even if deleted sooner.
+    const billedKeep = rate <= 0.5 ? Math.max(keep, 3) : keep;
     const store = [0, 0, 0];
-    for (let m = 1; m <= 36; m++) store[Math.floor((m - 1) / 12)] += gbMonth * Math.min(m, keep) * rate;
+    for (let m = 1; m <= 36; m++) store[Math.floor((m - 1) / 12)] += gbMonth * Math.min(m, billedKeep) * rate;
     const net = [NET * 12, NET * 12, NET * 12];
-    const cloudY = store.map((s, i) => s + net[i]), cloudT = cloudY.reduce((a, b) => a + b, 0);
+    // Upload and playback fees, 18% GST and currency movement: a 30% cushion so the real bill lands under the page, not over it.
+    const extra = store.map(v => v * 0.30);
+    const cloudY = store.map((v, i) => v + extra[i] + net[i]), cloudT = cloudY.reduce((a, b) => a + b, 0);
 
     const [cap, price] = drive(stored);
-    const nasY = [NAS_UNIT + 2 * price + NAS_POWER, NAS_POWER, NAS_POWER], nasT = nasY.reduce((a, b) => a + b, 0);
-    const diskY = [price + 300, 300, 300], diskT = diskY.reduce((a, b) => a + b, 0);
+    const hw = NAS_UNIT + 2 * price, gst = Math.round(hw * 0.18);
+    const nasY = [hw + gst + NAS_POWER, NAS_POWER, NAS_POWER], nasT = nasY.reduce((a, b) => a + b, 0);
+    const diskY = [Math.round(price * 1.18) + 300, 300, 300], diskT = diskY.reduce((a, b) => a + b, 0);
 
     $("v-cloud").textContent = inr(cloudT); $("v-local").textContent = inr(nasT);
     const save = cloudT - nasT;
@@ -282,8 +287,8 @@
     $("v-save-s").textContent = save >= 0 ? "over three years, compared with cloud" : "over three years, compared with a NAS";
 
     const rows = [
-      ["Cloud: storage", "Monthly", store], ...(NET ? [["Cloud: internet line for uploads", "Monthly", net]] : []),
-      ["Local NAS: 2-bay unit", "Once", [NAS_UNIT, 0, 0]], ["Local NAS: 2 × " + gb(cap) + " drives, mirrored", "Once", [2 * price, 0, 0]],
+      ["Cloud: storage", "Monthly", store], ["Cloud: fees, GST and 30% safety cushion", "Monthly", extra], ...(NET ? [["Cloud: internet line for uploads", "Monthly", net]] : []),
+      ["Local NAS: 2-bay unit", "Once", [NAS_UNIT, 0, 0]], ["Local NAS: 2 × " + gb(cap) + " drives, mirrored", "Once", [2 * price, 0, 0]], ["Local NAS: GST 18%", "Once", [gst, 0, 0]],
       ["Local NAS: electricity", "Yearly", [NAS_POWER, NAS_POWER, NAS_POWER]],
     ];
     let html = rows.map(([n, t, y]) => `<tr><td>${n}</td><td><span class="chip ${t === "Once" ? "once" : "recurring"}">${t}</span></td>` + y.map(v => `<td class="num">${inr(v)}</td>`).join("") + `<td class="num">${inr(y.reduce((a, b) => a + b, 0))}</td></tr>`).join("");
