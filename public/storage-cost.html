@@ -99,6 +99,23 @@
   .assume ul { padding-left: 18px; margin: 6px 0 0; } .assume li { margin: 3px 0; }
   .foot { border-top: 1px solid var(--line); padding: 16px 48px; font-size: 0.78rem; color: var(--ink-3); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
   @media (max-width: 600px) { .foot { padding-inline: 22px; } }
+  .actions { display: flex; justify-content: flex-end; gap: 10px; margin: -6px 0 18px; }
+  .btn { font: inherit; font-weight: 600; font-size: 0.9rem; padding: 10px 16px; border-radius: 8px; border: 1px solid var(--navy); background: var(--navy); color: #fff; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+  .btn:hover { background: #182765; } .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn svg { width: 16px; height: 16px; }
+  .print-only { display: none; }
+  @media print {
+    @page { size: A4; margin: 14mm; }
+    body { background: #fff; padding: 0; }
+    .sheet { max-width: none; border: 0; box-shadow: none; border-radius: 0; }
+    .mast, .inner { padding-inline: 0; } .foot { padding-inline: 0; }
+    .actions, .meta a, .hint, select, input { display: none !important; }
+    .print-only { display: block; font-size: 0.92rem; color: var(--ink-2); }
+    .calc { border: 0; padding: 0; margin-top: 8px; } .calc .grid { display: none; }
+    .tile, .card, .reco, .chip, .bar .track, .bar .fill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    h2 { break-after: avoid; } .tbl, .cols, .reco, .verdict, .bars { break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+  }
 </style>
   </head>
   <body>
@@ -116,6 +133,12 @@
     <h1>Cloud storage or a drive in your warehouse?</h1>
     <p class="lead">irisAI records a short video of every parcel being packed. Those videos need a home. Here is what each choice costs over three years, in plain rupees, using your own numbers.</p>
 
+    <div class="actions">
+      <button class="btn" id="pdfBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Download as PDF
+      </button>
+    </div>
     <div class="verdict">
       <div class="tile cloud"><div class="k">Cloud, 3 years</div><div class="v" id="v-cloud">₹ –</div><div class="s">Paid every month, for as long as you keep videos</div></div>
       <div class="tile local"><div class="k">Local drive, 3 years</div><div class="v" id="v-local">₹ –</div><div class="s">Bought once, then only electricity</div></div>
@@ -131,6 +154,7 @@
         <div><label for="keep">Keep videos for</label><select id="keep"><option value="1">1 month</option><option value="3">3 months</option><option value="6">6 months</option><option value="12" selected>1 year</option><option value="24">2 years</option></select></div>
         <div><label for="tier">Cloud provider</label><select id="tier"><option value="2.10">AWS S3 Standard, Mumbai</option><option value="1.15">AWS S3 Infrequent Access</option><option value="0.60">Wasabi or Backblaze B2</option></select></div>
       </div>
+      <p class="print-only" id="print-inputs"></p>
       <div class="derived">
         <span>One video <b id="d-video">–</b></span>
         <span>One day <b id="d-day">–</b></span>
@@ -223,6 +247,8 @@
     const mbVideo = mins * MB_PER_MIN[$("quality").value];
     const gbDay = perDay * mbVideo / 1024, gbMonth = gbDay * DAYS, stored = gbMonth * keep;
     $("d-video").textContent = Math.round(mbVideo) + " MB"; $("d-day").textContent = gb(gbDay);
+    const txt = (id) => $(id).options[$(id).selectedIndex].text;
+    $("print-inputs").textContent = `Calculated for ${perDay} videos a day, ${mins} minutes each, ${txt("quality")}, kept for ${txt("keep")}, cloud on ${txt("tier")}.`;
     $("d-month").textContent = gb(gbMonth); $("d-stored").textContent = gb(stored);
 
     const store = [0, 0, 0];
@@ -261,6 +287,10 @@
   }
   ["perDay", "mins", "quality", "keep", "tier"].forEach(id => $(id).addEventListener("input", calc));
   calc();
+  $("pdfBtn").addEventListener("click", () => {
+    const old = document.title; document.title = "irisAI video storage cost comparison";
+    window.print(); setTimeout(() => { document.title = old; }, 1000);
+  });
 })();
 </script>
 
