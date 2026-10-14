@@ -11,6 +11,7 @@ const COLS = [
       ['What changes', '#compare'],
       ['Why irisAI', '#why'],
       ['FAQs', '#faq'],
+      ['Storage cost guide', '/storage-cost.html'],
     ],
   ],
   [
