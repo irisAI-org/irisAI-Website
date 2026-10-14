@@ -152,7 +152,8 @@
         <div><label for="mins">Minutes per video</label><input id="mins" type="number" min="0.5" max="30" step="0.5" value="2.5"></div>
         <div><label for="quality">Camera quality</label><select id="quality"><option value="720" selected>HD 720p (irisAI default)</option><option value="1080">Full HD 1080p</option><option value="4k">4K Ultra HD</option></select></div>
         <div><label for="keep">Keep videos for</label><select id="keep"><option value="1">1 month</option><option value="3">3 months</option><option value="6">6 months</option><option value="12" selected>1 year</option><option value="24">2 years</option></select></div>
-        <div><label for="tier">Cloud provider</label><select id="tier"><option value="2.10">AWS S3 Standard, Mumbai</option><option value="1.15">AWS S3 Infrequent Access</option><option value="0.60">Wasabi or Backblaze B2</option></select></div>
+        <div><label for="tier">Cloud plan</label><select id="tier"><option value="0.42" selected>AWS Archive (Glacier Instant), cheapest</option><option value="0.60">Wasabi or Backblaze B2</option><option value="1.15">AWS Infrequent Access</option><option value="2.10">AWS Standard, most expensive</option></select></div>
+        <div><label for="net">Internet line</label><select id="net"><option value="0" selected>Warehouse already has internet</option><option value="1000">Add a line, ₹1,000 a month</option></select></div>
       </div>
       <p class="print-only" id="print-inputs"></p>
       <div class="derived">
@@ -166,6 +167,20 @@
 
     <h2>How big is one video</h2>
     <p>irisAI saves the camera's own stream without re-encoding, so quality is exactly what the camera produces. Measured across our Full HD recordings, a packing video averages 15 MB per minute, so a typical 2.5 minute pack is about 38 MB. A packing bench barely moves, which is why the files are smaller than a film of the same length. 720p roughly halves that; 4K is about four times larger.</p>
+
+    <h2>Cloud plans, in one line each</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Plan</th><th class="num">Per GB a month</th><th>Best for</th></tr></thead>
+        <tbody>
+          <tr><td><b>AWS Archive</b> (Glacier Instant)</td><td class="num">₹0.42</td><td>Videos you keep but rarely open. Still plays in seconds. A small fee each time a video is watched.</td></tr>
+          <tr><td><b>Wasabi or Backblaze B2</b></td><td class="num">₹0.60</td><td>Simple flat price, no fee to watch. Smaller companies than AWS.</td></tr>
+          <tr><td><b>AWS Infrequent Access</b></td><td class="num">₹1.15</td><td>Videos opened now and then. Small fee to watch, no delay.</td></tr>
+          <tr><td><b>AWS Standard</b></td><td class="num">₹2.10</td><td>Videos watched every day. No fee to watch. Costs the most to keep.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:10px">For packing proof, Archive is the right fit: videos are saved once and only opened when a customer raises a dispute.</p>
 
     <h2>What you pay, year by year</h2>
     <div class="tbl">
@@ -218,7 +233,7 @@
       <b>How the numbers are worked out</b>
       <ul>
         <li>Video size: measured from real irisAI recordings. Full HD averages 15 MB per minute (range 6 to 26 depending on movement and the camera's bitrate setting); 4K about 60 MB per minute; 720p estimated at 8 MB per minute. Videos are stored as the camera sends them, with no re-encoding.</li>
-        <li>Cloud: storage price per GB per month as selected (AWS S3 Standard Mumbai ₹2.10, S3 Infrequent Access ₹1.15, Wasabi or Backblaze B2 about ₹0.60), plus a 50 Mbps business internet line at ₹1,000 a month for uploads. Playback traffic stays within free allowances at these volumes. Infrequent Access also charges a small fee per playback, not included.</li>
+        <li>Cloud: storage price per GB per month as selected (AWS Glacier Instant Retrieval ₹0.42, Wasabi or Backblaze B2 about ₹0.60, AWS S3 Infrequent Access ₹1.15, AWS S3 Standard ₹2.10, all Mumbai region list prices). An internet line at ₹1,000 a month is added only if selected. Per-video playback fees on the AWS Archive and Infrequent Access plans are small at these volumes and not included.</li>
         <li>Local NAS: Synology DS224+ 2-bay unit about ₹34,000, plus two drives sized to your keep period (4 TB ₹10,000, 8 TB ₹18,000, 12 TB ₹27,000, 16 TB ₹36,000 each), mirrored so every video is kept twice. Electricity about ₹1,000 a year.</li>
         <li>Local single drive: one drive of the same size fitted in the irisAI station PC. No second copy.</li>
         <li>Indicative Indian retail and provider list prices, October 2026, rounded, excluding GST. Your exact bill will differ; the comparison will not.</li>
@@ -238,17 +253,17 @@
   const inr = (n) => "₹ " + Math.round(n).toLocaleString("en-IN");
   const gb = (n) => n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, "") + " TB" : Math.round(n) + " GB";
   const MB_PER_MIN = { "720": 8, "1080": 15, "4k": 60 };  // measured from irisAI recordings (1080p, 4K); 720p estimated
-  const DAYS = 26, NET = 1000, NAS_UNIT = 34000, NAS_POWER = 1000;
+  const DAYS = 26, NAS_UNIT = 34000, NAS_POWER = 1000;
   const DRIVES = [[4000, 10000], [8000, 18000], [12000, 27000], [16000, 36000], [20000, 48000]];
   const drive = (need) => DRIVES.find(([cap]) => cap >= need * 1.15) || DRIVES[DRIVES.length - 1];
 
   function calc() {
-    const perDay = +$("perDay").value || 0, mins = +$("mins").value || 0, keep = +$("keep").value, rate = +$("tier").value;
+    const perDay = +$("perDay").value || 0, mins = +$("mins").value || 0, keep = +$("keep").value, rate = +$("tier").value, NET = +$("net").value;
     const mbVideo = mins * MB_PER_MIN[$("quality").value];
     const gbDay = perDay * mbVideo / 1024, gbMonth = gbDay * DAYS, stored = gbMonth * keep;
     $("d-video").textContent = Math.round(mbVideo) + " MB"; $("d-day").textContent = gb(gbDay);
     const txt = (id) => $(id).options[$(id).selectedIndex].text;
-    $("print-inputs").textContent = `Calculated for ${perDay} videos a day, ${mins} minutes each, ${txt("quality")}, kept for ${txt("keep")}, cloud on ${txt("tier")}.`;
+    $("print-inputs").textContent = `Calculated for ${perDay} videos a day, ${mins} minutes each, ${txt("quality")}, kept for ${txt("keep")}, cloud plan: ${txt("tier")}. ${txt("net")}.`;
     $("d-month").textContent = gb(gbMonth); $("d-stored").textContent = gb(stored);
 
     const store = [0, 0, 0];
@@ -267,7 +282,7 @@
     $("v-save-s").textContent = save >= 0 ? "over three years, compared with cloud" : "over three years, compared with a NAS";
 
     const rows = [
-      ["Cloud: storage", "Monthly", store], ["Cloud: internet line for uploads", "Monthly", net],
+      ["Cloud: storage", "Monthly", store], ...(NET ? [["Cloud: internet line for uploads", "Monthly", net]] : []),
       ["Local NAS: 2-bay unit", "Once", [NAS_UNIT, 0, 0]], ["Local NAS: 2 × " + gb(cap) + " drives, mirrored", "Once", [2 * price, 0, 0]],
       ["Local NAS: electricity", "Yearly", [NAS_POWER, NAS_POWER, NAS_POWER]],
     ];
@@ -285,7 +300,7 @@
       ? `With these numbers, cloud costs as much as the NAS after about ${be} month${be > 1 ? "s" : ""}. After that, local is pure saving.`
       : "With these numbers, cloud stays cheaper for the full three years, because very little video is kept.";
   }
-  ["perDay", "mins", "quality", "keep", "tier"].forEach(id => $(id).addEventListener("input", calc));
+  ["perDay", "mins", "quality", "keep", "tier", "net"].forEach(id => $(id).addEventListener("input", calc));
   calc();
   $("pdfBtn").addEventListener("click", () => {
     const old = document.title; document.title = "irisAI video storage cost comparison";
