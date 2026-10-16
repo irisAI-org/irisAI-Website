@@ -215,7 +215,7 @@
     <div class="bars">
       <div class="bar cloud"><span><span class="dot cloud"></span>Cloud storage</span><div class="track"><div class="fill" id="b-cloud"></div></div><span class="amt" id="ba-cloud">–</span></div>
       <div class="bar local"><span><span class="dot local"></span>Local NAS, two mirrored drives</span><div class="track"><div class="fill" id="b-local"></div></div><span class="amt" id="ba-local">–</span></div>
-      <div class="bar local"><span><span class="dot local"></span>Local single drive in the PC</span><div class="track"><div class="fill" id="b-disk"></div></div><span class="amt" id="ba-disk">–</span></div>
+      <div class="bar local"><span><span class="dot local"></span>Local single 10 TB drive in the PC</span><div class="track"><div class="fill" id="b-disk"></div></div><span class="amt" id="ba-disk">–</span></div>
     </div>
     <p style="margin-top:14px" id="breakeven"></p>
 
@@ -255,8 +255,8 @@
       <ul>
         <li>Video size: measured from real irisAI recordings. Full HD averages 15 MB per minute (range 6 to 26 depending on movement and the camera's bitrate setting); 4K about 60 MB per minute; 720p estimated at 8 MB per minute. Videos are stored as the camera sends them, with no re-encoding.</li>
         <li>Cloud: storage price per GB per month as selected (AWS Glacier Instant Retrieval ₹0.42, Wasabi or Backblaze B2 about ₹0.60, AWS S3 Infrequent Access ₹1.15, AWS S3 Standard ₹2.10, all Mumbai region list prices). An internet line at ₹1,000 a month is added only if selected. On top of storage, a 30% cushion covers upload and playback fees, 18% GST and rupee-dollar movement, so the real bill should land under this page rather than over it. Archive plans charge every video for at least 90 days, which the calculator applies.</li>
-        <li>Local NAS: Synology DS224+ 2-bay unit about ₹34,000, plus two drives sized to your keep period (4 TB ₹10,000, 8 TB ₹18,000, 12 TB ₹27,000, 16 TB ₹36,000 each), mirrored so every video is kept twice, plus 18% GST. Electricity about ₹1,000 a year.</li>
-        <li>Local single drive: one drive of the same size fitted in the irisAI station PC. No second copy.</li>
+        <li>Local NAS: from a vendor quotation of September 2026. Synology DS425+ 4-bay unit ₹62,500, Seagate 10 TB enterprise drives ₹44,500 each (two mirrored for up to 10 TB, four for up to 20 TB), installation and setup ₹15,500, plus 18% GST. Electricity about ₹1,200 a year. Enterprise drives are rated for 24-hour use and carry a 5-year warranty.</li>
+        <li>Local single drive: one 10 TB enterprise drive fitted in the irisAI station PC, plus GST. No second copy.</li>
         <li>Indicative Indian retail and provider list prices, October 2026, rounded. Your exact bill will differ; the comparison will not.</li>
       </ul>
     </div>
@@ -274,9 +274,10 @@
   const inr = (n) => "₹ " + Math.round(n).toLocaleString("en-IN");
   const gb = (n) => n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, "") + " TB" : Math.round(n) + " GB";
   const MB_PER_MIN = { "720": 8, "1080": 15, "4k": 60 };  // measured from irisAI recordings (1080p, 4K); 720p estimated
-  const DAYS = 26, NAS_UNIT = 34000, NAS_POWER = 1000;
-  const DRIVES = [[4000, 10000], [8000, 18000], [12000, 27000], [16000, 36000], [20000, 48000]];
-  const drive = (need) => DRIVES.find(([cap]) => cap >= need * 1.15) || DRIVES[DRIVES.length - 1];
+  // Vendor quotation, September 2026: Synology DS425+ 4-bay, Seagate 10 TB enterprise drives, one-time setup.
+  const DAYS = 26, NAS_UNIT = 62500, NAS_SETUP = 15500, NAS_POWER = 1200, DRIVE_GB = 10000, DRIVE_PRICE = 44500;
+  // Mirrored pairs: 2 drives give 10 TB usable, 4 drives (the unit's limit) give 20 TB.
+  const drivesFor = (need) => (need * 1.15 <= DRIVE_GB ? 2 : 4);
 
   function calc() {
     const perDay = +$("perDay").value || 0, mins = +$("mins").value || 0, keep = +$("keep").value, rate = +$("tier").value, NET = +$("net").value;
@@ -296,10 +297,10 @@
     const extra = store.map(v => v * 0.30);
     const cloudY = store.map((v, i) => v + extra[i] + net[i]), cloudT = cloudY.reduce((a, b) => a + b, 0);
 
-    const [cap, price] = drive(stored);
-    const hw = NAS_UNIT + 2 * price, gst = Math.round(hw * 0.18);
+    const nDrives = drivesFor(stored), drivesCost = nDrives * DRIVE_PRICE;
+    const hw = NAS_UNIT + drivesCost + NAS_SETUP, gst = Math.round(hw * 0.18);
     const nasY = [hw + gst + NAS_POWER, NAS_POWER, NAS_POWER], nasT = nasY.reduce((a, b) => a + b, 0);
-    const diskY = [Math.round(price * 1.18) + 300, 300, 300], diskT = diskY.reduce((a, b) => a + b, 0);
+    const diskY = [Math.round(DRIVE_PRICE * 1.18) + 300, 300, 300], diskT = diskY.reduce((a, b) => a + b, 0);
 
     $("v-cloud").textContent = inr(cloudT); $("v-local").textContent = inr(nasT);
     const save = cloudT - nasT;
@@ -309,7 +310,9 @@
 
     const rows = [
       ["Cloud: storage", "Monthly", store], ["Cloud: fees, GST and 30% safety cushion", "Monthly", extra], ...(NET ? [["Cloud: internet line for uploads", "Monthly", net]] : []),
-      ["Local NAS: 2-bay unit", "Once", [NAS_UNIT, 0, 0]], ["Local NAS: 2 × " + gb(cap) + " drives, mirrored", "Once", [2 * price, 0, 0]], ["Local NAS: GST 18%", "Once", [gst, 0, 0]],
+      ["Local NAS: Synology DS425+ 4-bay unit", "Once", [NAS_UNIT, 0, 0]],
+      ["Local NAS: " + nDrives + " × 10 TB enterprise drives, mirrored", "Once", [drivesCost, 0, 0]],
+      ["Local NAS: installation and setup", "Once", [NAS_SETUP, 0, 0]], ["Local NAS: GST 18%", "Once", [gst, 0, 0]],
       ["Local NAS: electricity", "Yearly", [NAS_POWER, NAS_POWER, NAS_POWER]],
     ];
     let html = rows.map(([n, t, y]) => `<tr><td>${n}</td><td><span class="chip ${t === "Once" ? "once" : "recurring"}">${t}</span></td>` + y.map(v => `<td class="num">${inr(v)}</td>`).join("") + `<td class="num">${inr(y.reduce((a, b) => a + b, 0))}</td></tr>`).join("");
