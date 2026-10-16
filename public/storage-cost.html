@@ -46,6 +46,7 @@
   .tile .k { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-3); font-weight: 700; }
   .tile .v { font-family: var(--display); font-size: 1.9rem; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; margin-top: 6px; line-height: 1.1; }
   .tile .s { font-size: 0.84rem; color: var(--ink-2); margin-top: 6px; }
+  .tile .s b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
   .tile.cloud { background: var(--cloud-soft); } .tile.cloud .v { color: var(--cloud); }
   .tile.local { background: var(--local-soft); } .tile.local .v { color: var(--local); }
   .tile.save { background: var(--navy); } .tile.save .k { color: #b9c0dc; } .tile.save .v { color: #fff; } .tile.save .s { color: #c9cfe6; }
@@ -140,8 +141,8 @@
       </button>
     </div>
     <div class="verdict">
-      <div class="tile cloud"><div class="k">Cloud, 3 years</div><div class="v" id="v-cloud">₹ –</div><div class="s">Paid every month, for as long as you keep videos</div></div>
-      <div class="tile local"><div class="k">Local drive, 3 years</div><div class="v" id="v-local">₹ –</div><div class="s">Bought once, then only electricity</div></div>
+      <div class="tile cloud"><div class="k">Cloud, 3 years</div><div class="v" id="v-cloud">₹ –</div><div class="s"><b id="pv-cloud">–</b> per video · paid monthly for as long as you keep videos</div></div>
+      <div class="tile local"><div class="k">Local drive, 3 years</div><div class="v" id="v-local">₹ –</div><div class="s"><b id="pv-local">–</b> per video · bought once, then only electricity</div></div>
       <div class="tile save"><div class="k" id="v-save-k">Difference</div><div class="v" id="v-save">₹ –</div><div class="s" id="v-save-s">over three years</div></div>
     </div>
 
@@ -255,6 +256,7 @@
         <li>Video size: measured from real irisAI recordings. Full HD averages 15 MB per minute (range 6 to 26 depending on movement and the camera's bitrate setting); 4K about 60 MB per minute; 720p estimated at 8 MB per minute. Videos are stored as the camera sends them, with no re-encoding.</li>
         <li>Cloud: storage price per GB per month as selected (AWS Glacier Instant Retrieval ₹0.42, Wasabi or Backblaze B2 about ₹0.60, AWS S3 Infrequent Access ₹1.15, AWS S3 Standard ₹2.10, all Mumbai region list prices). An internet line at ₹1,000 a month is added only if selected. On top of storage, a 30% cushion covers upload and playback fees, 18% GST and rupee-dollar movement, so the real bill should land under this page rather than over it. Archive plans charge every video for at least 90 days, which the calculator applies.</li>
         <li>Local NAS: from a vendor quotation of September 2026. Synology DS425+ 4-bay unit ₹62,500, Seagate 10 TB enterprise drives ₹44,500 each (two mirrored for up to 10 TB, four for up to 20 TB), installation and setup ₹15,500, plus 18% GST. Electricity about ₹1,200 a year. Enterprise drives are rated for 24-hour use and carry a 5-year warranty.</li>
+        <li>Per-video cost is the three-year total divided by every video recorded in those three years (videos per day × 26 days × 36 months).</li>
         <li>Indicative Indian retail and provider list prices, October 2026, rounded. Your exact bill will differ; the comparison will not.</li>
       </ul>
     </div>
@@ -300,6 +302,10 @@
     const nasY = [hw + gst + NAS_POWER, NAS_POWER, NAS_POWER], nasT = nasY.reduce((a, b) => a + b, 0);
 
     $("v-cloud").textContent = inr(cloudT); $("v-local").textContent = inr(nasT);
+    // Three years of videos, so the one-time hardware is spread over every video it will ever hold.
+    const videos3y = Math.max(1, perDay * DAYS * 36);
+    const perVideo = (n) => "₹ " + (n / videos3y).toFixed(2);
+    $("pv-cloud").textContent = perVideo(cloudT); $("pv-local").textContent = perVideo(nasT);
     const save = cloudT - nasT;
     $("v-save").textContent = inr(Math.abs(save));
     $("v-save-k").textContent = save >= 0 ? "You keep with local" : "You keep with cloud";
