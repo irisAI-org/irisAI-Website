@@ -172,14 +172,14 @@
       <table>
         <thead><tr><th>Plan</th><th class="num">Per video, incl. GST</th><th>Best for</th></tr></thead>
         <tbody>
-          <tr><td><b>AWS Archive</b></td><td class="num">₹1.00</td><td>Cheapest. Videos rarely opened.</td></tr>
-          <tr><td><b>Wasabi or Backblaze</b></td><td class="num">₹1.40</td><td>Smaller providers.</td></tr>
-          <tr><td><b>AWS Infrequent Access</b> · recommended</td><td class="num">₹2.10</td><td>Best balance of price and reliability.</td></tr>
-          <tr><td><b>AWS Standard</b></td><td class="num">₹3.15</td><td>For videos watched daily.</td></tr>
+          <tr><td><b>AWS Archive</b></td><td class="num" id="t-1.00">₹1.00</td><td>Cheapest. Videos rarely opened.</td></tr>
+          <tr><td><b>Wasabi or Backblaze</b></td><td class="num" id="t-1.40">₹1.40</td><td>Smaller providers.</td></tr>
+          <tr><td><b>AWS Infrequent Access</b> · recommended</td><td class="num" id="t-2.10">₹2.10</td><td>Best balance of price and reliability.</td></tr>
+          <tr><td><b>AWS Standard</b></td><td class="num" id="t-3.15">₹3.15</td><td>For videos watched daily.</td></tr>
         </tbody>
       </table>
     </div>
-    <p style="margin-top:10px">Every plan plays a video within seconds.</p>
+    <p style="margin-top:10px">Per-video prices follow your numbers above: a longer or sharper video costs more, a shorter keep period costs less. Every plan plays a video within seconds.</p>
 
     <h2>Is cloud safe?</h2>
     <div class="card cloud">
@@ -239,7 +239,7 @@
       <b>Basis</b>
       <ul>
         <li>Video size from real irisAI recordings: 720p about 8 MB a minute, Full HD 15 MB, 4K 60 MB.</li>
-        <li>Cloud: per-video rates as shown in the plans table, GST included.</li>
+        <li>Cloud: per-video rates as shown in the plans table, GST included. Quoted for a 2.5 minute 720p video kept 12 months, and scaled by video size and keep period.</li>
         <li>Local: vendor quotation, September 2026. Synology DS425+ ₹62,500, Seagate 10 TB enterprise drives ₹44,500 each (mirrored), setup ₹15,500, plus 18% GST. Electricity about ₹1,200 a year.</li>
         <li>Per video: three-year total divided by all videos recorded in three years.</li>
         <li>Prices as of October 2026, rounded.</li>
@@ -273,8 +273,12 @@
     $("print-inputs").textContent = `Calculated for ${perDay} videos a day, ${mins} minutes each, ${txt("quality")}, kept for ${txt("keep")}, cloud plan: ${txt("tier")}. ${txt("net")}.`;
     $("d-month").textContent = gb(gbMonth); $("d-stored").textContent = gb(stored);
 
-    // Cloud is priced per video recorded, flat for the chosen keep period.
-    const perYear = perDay * DAYS * 12 * rate;
+    // The quoted per-video price is for the reference video (2.5 min at 720p, kept 12 months);
+    // it scales with the video's size and how long it is kept.
+    const REF_MB = 2.5 * MB_PER_MIN["720"], REF_MONTHS = 12;
+    const perVideoCloud = (base) => base * (mbVideo / REF_MB) * (keep / REF_MONTHS);
+    ["1.00", "1.40", "2.10", "3.15"].forEach(b => { $("t-" + b).textContent = "₹" + perVideoCloud(+b).toFixed(2); });
+    const perYear = perDay * DAYS * 12 * perVideoCloud(rate);
     const store = [perYear, perYear, perYear];
     const net = [NET * 12, NET * 12, NET * 12];
     const extra = [0, 0, 0];  // per-video rates are GST inclusive
