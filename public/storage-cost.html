@@ -170,12 +170,12 @@
     <h2>Cloud plans</h2>
     <div class="tbl">
       <table>
-        <thead><tr><th>Plan</th><th class="num">Per GB a month</th><th>Best for</th></tr></thead>
+        <thead><tr><th>Plan</th><th class="num">Per video</th><th>Best for</th></tr></thead>
         <tbody>
-          <tr><td><b>AWS Archive</b></td><td class="num">₹1.00</td><td>Cheapest. Small fee per view. Each video billed for at least 90 days.</td></tr>
-          <tr><td><b>Wasabi or Backblaze</b></td><td class="num">₹1.40</td><td>Flat price, no fee per view. Smaller providers.</td></tr>
-          <tr><td><b>AWS Infrequent Access</b> · recommended</td><td class="num">₹2.10</td><td>Low price, small fee per view, no surprises.</td></tr>
-          <tr><td><b>AWS Standard</b></td><td class="num">₹3.15</td><td>For videos watched daily. Costs the most.</td></tr>
+          <tr><td><b>AWS Archive</b></td><td class="num">₹1.00</td><td>Cheapest. Videos rarely opened.</td></tr>
+          <tr><td><b>Wasabi or Backblaze</b></td><td class="num">₹1.40</td><td>Smaller providers.</td></tr>
+          <tr><td><b>AWS Infrequent Access</b> · recommended</td><td class="num">₹2.10</td><td>Best balance of price and reliability.</td></tr>
+          <tr><td><b>AWS Standard</b></td><td class="num">₹3.15</td><td>For videos watched daily.</td></tr>
         </tbody>
       </table>
     </div>
@@ -232,14 +232,14 @@
 
     <div class="reco">
       <span class="eyebrow">Our recommendation</span>
-      <p>Start with cloud on AWS Infrequent Access. It is cheaper at this volume and there is nothing to maintain. Move to a local drive if you add several cameras or keep videos for years. irisAI works with both.</p>
+      <p id="reco-text"></p>
     </div>
 
     <div class="assume">
       <b>Basis</b>
       <ul>
         <li>Video size from real irisAI recordings: 720p about 8 MB a minute, Full HD 15 MB, 4K 60 MB.</li>
-        <li>Cloud: per-GB rates as shown in the plans table, plus 18% GST.</li>
+        <li>Cloud: per-video rates as shown in the plans table, plus 18% GST.</li>
         <li>Local: vendor quotation, September 2026. Synology DS425+ ₹62,500, Seagate 10 TB enterprise drives ₹44,500 each (mirrored), setup ₹15,500, plus 18% GST. Electricity about ₹1,200 a year.</li>
         <li>Per video: three-year total divided by all videos recorded in three years.</li>
         <li>Prices as of October 2026, rounded.</li>
@@ -273,10 +273,9 @@
     $("print-inputs").textContent = `Calculated for ${perDay} videos a day, ${mins} minutes each, ${txt("quality")}, kept for ${txt("keep")}, cloud plan: ${txt("tier")}. ${txt("net")}.`;
     $("d-month").textContent = gb(gbMonth); $("d-stored").textContent = gb(stored);
 
-    // Archive plans bill every video for at least 90 days, even if deleted sooner.
-    const billedKeep = rate <= 1.0 ? Math.max(keep, 3) : keep;
-    const store = [0, 0, 0];
-    for (let m = 1; m <= 36; m++) store[Math.floor((m - 1) / 12)] += gbMonth * Math.min(m, billedKeep) * rate;
+    // Cloud is priced per video recorded, flat for the chosen keep period.
+    const perYear = perDay * DAYS * 12 * rate;
+    const store = [perYear, perYear, perYear];
     const net = [NET * 12, NET * 12, NET * 12];
     const extra = store.map(v => v * 0.18);  // GST, same as on the hardware
     const cloudY = store.map((v, i) => v + extra[i] + net[i]), cloudT = cloudY.reduce((a, b) => a + b, 0);
@@ -296,7 +295,7 @@
     $("v-save-s").textContent = save >= 0 ? "over three years, compared with cloud" : "over three years, compared with a NAS";
 
     const rows = [
-      ["Cloud: storage", "Monthly", store], ["Cloud: GST 18%", "Monthly", extra], ...(NET ? [["Cloud: internet line for uploads", "Monthly", net]] : []),
+      ["Cloud: storage, per video", "Monthly", store], ["Cloud: GST 18%", "Monthly", extra], ...(NET ? [["Cloud: internet line for uploads", "Monthly", net]] : []),
       ["Local NAS: Synology DS425+ 4-bay unit", "Once", [NAS_UNIT, 0, 0]],
       ["Local NAS: " + nDrives + " × 10 TB enterprise drives, mirrored", "Once", [drivesCost, 0, 0]],
       ["Local NAS: installation and setup", "Once", [NAS_SETUP, 0, 0]], ["Local NAS: GST 18%", "Once", [gst, 0, 0]],
@@ -312,6 +311,9 @@
 
     let cum = 0, be = null;
     for (let m = 1; m <= 36; m++) { cum += gbMonth * Math.min(m, keep) * rate + NET; if (cum >= nasY[0]) { be = m; break; } }
+    $("reco-text").textContent = cloudT <= nasT
+      ? "Cloud is the cheaper and simpler choice at this volume, with nothing to maintain on site. irisAI works with both."
+      : "A local drive is the cheaper choice at this volume: paid once, and extra cameras cost nothing. Choose cloud if you need to watch videos from outside the warehouse. irisAI works with both.";
     $("breakeven").textContent = be
       ? `With these numbers, cloud costs as much as the NAS after about ${be} month${be > 1 ? "s" : ""}. After that, local is pure saving.`
       : "With these numbers, cloud stays cheaper for the full three years, because very little video is kept.";
