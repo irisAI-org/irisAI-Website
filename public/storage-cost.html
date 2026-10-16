@@ -239,7 +239,7 @@
       <b>Basis</b>
       <ul>
         <li>Video size from real irisAI recordings: 720p about 8 MB a minute, Full HD 15 MB, 4K 60 MB.</li>
-        <li>Cloud: per-GB rates as shown in the plans table, plus a 50% cushion for fees, 18% GST and currency movement.</li>
+        <li>Cloud: per-GB rates as shown in the plans table, plus 18% GST.</li>
         <li>Local: vendor quotation, September 2026. Synology DS425+ ₹62,500, Seagate 10 TB enterprise drives ₹44,500 each (mirrored), setup ₹15,500, plus 18% GST. Electricity about ₹1,200 a year.</li>
         <li>Per video: three-year total divided by all videos recorded in three years.</li>
         <li>Prices as of October 2026, rounded.</li>
@@ -278,8 +278,7 @@
     const store = [0, 0, 0];
     for (let m = 1; m <= 36; m++) store[Math.floor((m - 1) / 12)] += gbMonth * Math.min(m, billedKeep) * rate;
     const net = [NET * 12, NET * 12, NET * 12];
-    // Upload and playback fees, 18% GST, currency movement and a margin for error: a 50% cushion so the real bill lands well under the page, never over it.
-    const extra = store.map(v => v * 0.50);
+    const extra = store.map(v => v * 0.18);  // GST, same as on the hardware
     const cloudY = store.map((v, i) => v + extra[i] + net[i]), cloudT = cloudY.reduce((a, b) => a + b, 0);
 
     const nDrives = drivesFor(stored), drivesCost = nDrives * DRIVE_PRICE;
@@ -297,7 +296,7 @@
     $("v-save-s").textContent = save >= 0 ? "over three years, compared with cloud" : "over three years, compared with a NAS";
 
     const rows = [
-      ["Cloud: storage", "Monthly", store], ["Cloud: fees, GST and 50% safety cushion", "Monthly", extra], ...(NET ? [["Cloud: internet line for uploads", "Monthly", net]] : []),
+      ["Cloud: storage", "Monthly", store], ["Cloud: GST 18%", "Monthly", extra], ...(NET ? [["Cloud: internet line for uploads", "Monthly", net]] : []),
       ["Local NAS: Synology DS425+ 4-bay unit", "Once", [NAS_UNIT, 0, 0]],
       ["Local NAS: " + nDrives + " × 10 TB enterprise drives, mirrored", "Once", [drivesCost, 0, 0]],
       ["Local NAS: installation and setup", "Once", [NAS_SETUP, 0, 0]], ["Local NAS: GST 18%", "Once", [gst, 0, 0]],
