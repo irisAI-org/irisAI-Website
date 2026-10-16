@@ -170,7 +170,7 @@
     <h2>Cloud plans</h2>
     <div class="tbl">
       <table>
-        <thead><tr><th>Plan</th><th class="num">Per video</th><th>Best for</th></tr></thead>
+        <thead><tr><th>Plan</th><th class="num">Per video, incl. GST</th><th>Best for</th></tr></thead>
         <tbody>
           <tr><td><b>AWS Archive</b></td><td class="num">₹1.00</td><td>Cheapest. Videos rarely opened.</td></tr>
           <tr><td><b>Wasabi or Backblaze</b></td><td class="num">₹1.40</td><td>Smaller providers.</td></tr>
@@ -239,7 +239,7 @@
       <b>Basis</b>
       <ul>
         <li>Video size from real irisAI recordings: 720p about 8 MB a minute, Full HD 15 MB, 4K 60 MB.</li>
-        <li>Cloud: per-video rates as shown in the plans table, plus 18% GST.</li>
+        <li>Cloud: per-video rates as shown in the plans table, GST included.</li>
         <li>Local: vendor quotation, September 2026. Synology DS425+ ₹62,500, Seagate 10 TB enterprise drives ₹44,500 each (mirrored), setup ₹15,500, plus 18% GST. Electricity about ₹1,200 a year.</li>
         <li>Per video: three-year total divided by all videos recorded in three years.</li>
         <li>Prices as of October 2026, rounded.</li>
@@ -277,7 +277,7 @@
     const perYear = perDay * DAYS * 12 * rate;
     const store = [perYear, perYear, perYear];
     const net = [NET * 12, NET * 12, NET * 12];
-    const extra = store.map(v => v * 0.18);  // GST, same as on the hardware
+    const extra = [0, 0, 0];  // per-video rates are GST inclusive
     const cloudY = store.map((v, i) => v + extra[i] + net[i]), cloudT = cloudY.reduce((a, b) => a + b, 0);
 
     const nDrives = drivesFor(stored), drivesCost = nDrives * DRIVE_PRICE;
@@ -295,7 +295,7 @@
     $("v-save-s").textContent = save >= 0 ? "over three years, compared with cloud" : "over three years, compared with a NAS";
 
     const rows = [
-      ["Cloud: storage, per video", "Monthly", store], ["Cloud: GST 18%", "Monthly", extra], ...(NET ? [["Cloud: internet line for uploads", "Monthly", net]] : []),
+      ["Cloud: storage, per video (incl. GST)", "Monthly", store], ...(NET ? [["Cloud: internet line for uploads", "Monthly", net]] : []),
       ["Local NAS: Synology DS425+ 4-bay unit", "Once", [NAS_UNIT, 0, 0]],
       ["Local NAS: " + nDrives + " × 10 TB enterprise drives, mirrored", "Once", [drivesCost, 0, 0]],
       ["Local NAS: installation and setup", "Once", [NAS_SETUP, 0, 0]], ["Local NAS: GST 18%", "Once", [gst, 0, 0]],
