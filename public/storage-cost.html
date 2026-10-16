@@ -130,9 +130,9 @@
   </header>
 
   <div class="inner">
-    <div class="eyebrow">Where should your packing videos live?</div>
-    <h1>Cloud storage or a drive in your warehouse?</h1>
-    <p class="lead">irisAI records a short video of every parcel being packed. Those videos need a home. Here is what each choice costs over three years, in plain rupees, using your own numbers.</p>
+    <div class="eyebrow">Video storage cost</div>
+    <h1>Cloud or a drive in your warehouse?</h1>
+    <p class="lead">Every packed parcel gets a short video. Here is what it costs to keep those videos, two ways, over three years.</p>
 
     <div class="actions">
       <button class="btn" id="pdfBtn" type="button">
@@ -141,20 +141,20 @@
       </button>
     </div>
     <div class="verdict">
-      <div class="tile cloud"><div class="k">Cloud, 3 years</div><div class="v" id="v-cloud">₹ –</div><div class="s"><b id="pv-cloud">–</b> per video · paid monthly for as long as you keep videos</div></div>
-      <div class="tile local"><div class="k">Local drive, 3 years</div><div class="v" id="v-local">₹ –</div><div class="s"><b id="pv-local">–</b> per video · bought once, then only electricity</div></div>
+      <div class="tile cloud"><div class="k">Cloud, 3 years</div><div class="v" id="v-cloud">₹ –</div><div class="s"><b id="pv-cloud">–</b> per video · paid monthly</div></div>
+      <div class="tile local"><div class="k">Local drive, 3 years</div><div class="v" id="v-local">₹ –</div><div class="s"><b id="pv-local">–</b> per video · paid once</div></div>
       <div class="tile save"><div class="k" id="v-save-k">Difference</div><div class="v" id="v-save">₹ –</div><div class="s" id="v-save-s">over three years</div></div>
     </div>
 
     <div class="calc">
-      <div class="eyebrow" style="margin-bottom:12px">Your numbers. Change any of them</div>
+      <div class="eyebrow" style="margin-bottom:12px">Your numbers</div>
       <div class="grid">
         <div><label for="perDay">Videos per day</label><input id="perDay" type="number" min="1" max="5000" value="300"></div>
         <div><label for="mins">Minutes per video</label><input id="mins" type="number" min="0.5" max="30" step="0.5" value="2.5"></div>
         <div><label for="quality">Camera quality</label><select id="quality"><option value="720" selected>HD 720p (irisAI default)</option><option value="1080">Full HD 1080p</option><option value="4k">4K Ultra HD</option></select></div>
-        <div><label for="keep">Keep videos for</label><select id="keep"><option value="1">1 month</option><option value="3">3 months</option><option value="6">6 months</option><option value="12" selected>1 year</option><option value="24">2 years</option></select></div>
+        <div><label for="keep">Keep each video for</label><select id="keep"><option value="1">1 month</option><option value="3">3 months</option><option value="6">6 months</option><option value="12" selected>1 year</option><option value="24">2 years</option></select></div>
         <div><label for="tier">Cloud plan</label><select id="tier"><option value="0.42">AWS Archive (Glacier Instant), cheapest</option><option value="0.60">Wasabi or Backblaze B2</option><option value="1.15" selected>AWS Infrequent Access (recommended)</option><option value="2.10">AWS Standard, most expensive</option></select></div>
-        <div><label for="net">Internet line</label><select id="net"><option value="0" selected>Warehouse already has internet</option><option value="1000">Add a line, ₹1,000 a month</option></select></div>
+        <div><label for="net">Internet</label><select id="net"><option value="0" selected>Already have it</option><option value="1000">Need a new line, ₹1,000 a month</option></select></div>
       </div>
       <p class="print-only" id="print-inputs"></p>
       <div class="derived">
@@ -163,48 +163,35 @@
         <span>One month <b id="d-month">–</b></span>
         <span>Kept at any time <b id="d-stored">–</b></span>
       </div>
-      <p class="hint">26 working days a month. Videos older than the keep period are deleted automatically, so storage stops growing after that.</p>
+      <p class="hint">Videos older than the keep period are deleted automatically. 26 working days a month.</p>
     </div>
 
-    <h2>How big is one video</h2>
-    <p>irisAI saves the camera's own stream without re-encoding, so quality is exactly what the camera produces. Measured across our Full HD recordings, a packing video averages 15 MB per minute, so a typical 2.5 minute pack is about 38 MB. A packing bench barely moves, which is why the files are smaller than a film of the same length. 720p roughly halves that; 4K is about four times larger.</p>
 
-    <h2>Cloud plans, in one line each</h2>
+    <h2>Cloud plans</h2>
     <div class="tbl">
       <table>
         <thead><tr><th>Plan</th><th class="num">Per GB a month</th><th>Best for</th></tr></thead>
         <tbody>
-          <tr><td><b>AWS Archive</b> (Glacier Instant)</td><td class="num">₹0.42</td><td>Videos you keep but rarely open. Still plays in seconds. A small fee each time a video is watched.</td></tr>
-          <tr><td><b>Wasabi or Backblaze B2</b></td><td class="num">₹0.60</td><td>Simple flat price, no fee to watch. Smaller companies than AWS.</td></tr>
-          <tr><td><b>AWS Infrequent Access</b></td><td class="num">₹1.15</td><td>Videos opened now and then. Small fee to watch, no delay.</td></tr>
-          <tr><td><b>AWS Standard</b></td><td class="num">₹2.10</td><td>Videos watched every day. No fee to watch. Costs the most to keep.</td></tr>
+          <tr><td><b>AWS Archive</b></td><td class="num">₹0.42</td><td>Cheapest. Small fee per view. Each video billed for at least 90 days.</td></tr>
+          <tr><td><b>Wasabi or Backblaze</b></td><td class="num">₹0.60</td><td>Flat price, no fee per view. Smaller providers.</td></tr>
+          <tr><td><b>AWS Infrequent Access</b> · recommended</td><td class="num">₹1.15</td><td>Low price, small fee per view, no surprises.</td></tr>
+          <tr><td><b>AWS Standard</b></td><td class="num">₹2.10</td><td>For videos watched daily. Costs the most.</td></tr>
         </tbody>
       </table>
     </div>
-    <p style="margin-top:10px">We recommend Infrequent Access: videos are saved once and opened only when a dispute comes up, and this plan keeps playback instant with no minimum-storage surprises. Archive is cheaper still if you are comfortable with its 90-day minimum.</p>
+    <p style="margin-top:10px">Every plan plays a video within seconds.</p>
 
-    <h2>Is cloud safe, and can I get videos back quickly?</h2>
-    <div class="cols">
-      <div class="card cloud">
-        <h3>Getting a video back</h3>
-        <ul>
-          <li class="good">Plays within a second or two on every plan shown here</li>
-          <li class="good">The slower AWS archives (hours to retrieve) are deliberately not offered</li>
-          <li class="good">Videos older than the keep period are deleted automatically</li>
-        </ul>
-      </div>
-      <div class="card cloud">
-        <h3>How it is protected</h3>
-        <ul>
-          <li class="good">Stored in Mumbai, so data stays in India</li>
-          <li class="good">Encrypted on disk and in transit, private by default</li>
-          <li class="good">Opened only through an irisAI link that expires</li>
-          <li class="good">Can be locked so nobody, not even an admin, can alter or delete a video before its date</li>
-        </ul>
-      </div>
+    <h2>Is cloud safe?</h2>
+    <div class="card cloud">
+      <ul>
+        <li class="good">Stored in Mumbai. Data stays in India</li>
+        <li class="good">Encrypted and private. Opens only through an irisAI link</li>
+        <li class="good">Can be locked so nobody can edit or delete a video</li>
+        <li class="good">Plays within seconds</li>
+      </ul>
     </div>
 
-    <h2>What you pay, year by year</h2>
+    <h2>Year by year</h2>
     <div class="tbl">
       <table>
         <thead><tr><th>Item</th><th>Paid</th><th class="num">Year 1</th><th class="num">Year 2</th><th class="num">Year 3</th><th class="num">3-year total</th></tr></thead>
@@ -224,40 +211,38 @@
       <div class="card cloud">
         <h3>Cloud storage</h3>
         <ul>
-          <li class="good">Watch any video from anywhere, on any device</li>
-          <li class="good">Nothing to buy or look after in the warehouse</li>
-          <li class="good">Safe from theft, fire or a failed disk on site</li>
-          <li class="bad">Needs a steady internet line all day</li>
-          <li class="bad">The bill never ends and grows with every camera</li>
-          <li class="bad">Customer videos leave your premises</li>
+          <li class="good">Watch from anywhere</li>
+          <li class="good">Nothing to buy or maintain</li>
+          <li class="good">Safe from theft, fire or disk failure</li>
+          <li class="bad">Needs internet all day</li>
+          <li class="bad">Monthly bill, grows with cameras</li>
         </ul>
       </div>
       <div class="card local">
         <h3>Local drive</h3>
         <ul>
-          <li class="good">Pay once. A second camera costs nothing extra</li>
-          <li class="good">Works with no internet. Playback is instant</li>
+          <li class="good">Pay once. Extra cameras cost nothing</li>
+          <li class="good">Works without internet</li>
           <li class="good">Videos never leave the building</li>
-          <li class="bad">Watching from outside needs remote access set up</li>
-          <li class="good">Mirrored drives, so every video is kept twice</li>
-          <li class="bad">A drive needs replacing every few years</li>
+          <li class="bad">Watching from outside needs setup</li>
+          <li class="bad">Hardware to maintain on site</li>
         </ul>
       </div>
     </div>
 
     <div class="reco">
       <span class="eyebrow">Our recommendation</span>
-      <p>At a few hundred videos a day on the Infrequent Access plan, cloud is the cheaper and simpler start, and there is nothing to look after on site. A local drive wins once you keep videos longer, add cameras, or pass roughly a terabyte in storage, because it is paid for once. irisAI works with either, and many customers do both: everything saved locally, with only disputed videos sent to the cloud.</p>
+      <p>Start with cloud on AWS Infrequent Access. It is cheaper at this volume and there is nothing to maintain. Move to a local drive if you add several cameras or keep videos for years. irisAI works with both.</p>
     </div>
 
     <div class="assume">
-      <b>How the numbers are worked out</b>
+      <b>Basis</b>
       <ul>
-        <li>Video size: measured from real irisAI recordings. Full HD averages 15 MB per minute (range 6 to 26 depending on movement and the camera's bitrate setting); 4K about 60 MB per minute; 720p estimated at 8 MB per minute. Videos are stored as the camera sends them, with no re-encoding.</li>
-        <li>Cloud: storage price per GB per month as selected (AWS Glacier Instant Retrieval ₹0.42, Wasabi or Backblaze B2 about ₹0.60, AWS S3 Infrequent Access ₹1.15, AWS S3 Standard ₹2.10, all Mumbai region list prices). An internet line at ₹1,000 a month is added only if selected. On top of storage, a 50% cushion covers upload and playback fees, 18% GST, rupee-dollar movement and a margin for error, so the real bill should land well under this page, never over it. Archive plans charge every video for at least 90 days, which the calculator applies.</li>
-        <li>Local NAS: from a vendor quotation of September 2026. Synology DS425+ 4-bay unit ₹62,500, Seagate 10 TB enterprise drives ₹44,500 each (two mirrored for up to 10 TB, four for up to 20 TB), installation and setup ₹15,500, plus 18% GST. Electricity about ₹1,200 a year. Enterprise drives are rated for 24-hour use and carry a 5-year warranty.</li>
-        <li>Per-video cost is the three-year total divided by every video recorded in those three years (videos per day × 26 days × 36 months).</li>
-        <li>Indicative Indian retail and provider list prices, October 2026, rounded. Your exact bill will differ; the comparison will not.</li>
+        <li>Video size from real irisAI recordings: 720p about 8 MB a minute, Full HD 15 MB, 4K 60 MB.</li>
+        <li>Cloud: AWS Mumbai and provider list prices, plus a 50% cushion for fees, 18% GST and currency movement. The real bill should land under this page.</li>
+        <li>Local: vendor quotation, September 2026. Synology DS425+ ₹62,500, Seagate 10 TB enterprise drives ₹44,500 each (mirrored), setup ₹15,500, plus 18% GST. Electricity about ₹1,200 a year.</li>
+        <li>Per video: three-year total divided by all videos recorded in three years.</li>
+        <li>Prices as of October 2026, rounded.</li>
       </ul>
     </div>
   </div>
